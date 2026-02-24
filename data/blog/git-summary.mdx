@@ -1,0 +1,78 @@
+---
+title: 'Git Summary'
+date: '2024-05-17'
+tags: ['Git']
+draft: false
+summary: '常用的 git 命令'
+---
+
+1. 版本回退 
+    
+    git revert 
+    
+    如果是 merge的记录 需要使用 git revert -m 1 CommitId 【表明是基于父级别，进行revert】！ 
+    
+    如果使用了 git reset 是不会产生 一条commit记录，来记录revert操作的， 这样子会导致 在push的时候，显示没有可以推送的内容；所以导致根本没有回退成功；
+    
+2. 不同仓库进行分支迁移
+    
+    A仓库的分支 迁移到B仓库中；
+    
+    在A仓库中切到需要迁移的分支；
+    
+    然后添加 源； 通过push 源 进行远程推送；
+    
+    ```jsx
+    // A仓库切到对应的分支
+    git remote add custome ssh://git@gitlab.xxxx.xxxx/repos/xxxx.git
+    git push repo branchName
+    // 需要仓库的权限以及推送分支的权限
+    
+    // 迁移该分支上的tag记录
+    查看指定的tag ，然后 通过
+    git push origin v1.0.0， 完成一个个迁移
+    
+    // 如果需要批量迁移仓库中的所有Tags
+    git push -u custome --tags
+    
+    ```
+    
+3. 不同仓库 cherry-pick
+    ```
+    git remote -v 查看远程
+    ```
+    
+4. 修改本地分支与远程分支的关联
+    
+    ```jsx
+    git branch --set-upstream-to=origin/master dev
+    ```
+    
+5. 修改本地分支与对应的远程同分支
+    
+    ```jsx
+    git branch -m newBranchName
+    git push -delete origin oldBranch
+    git push origin newBranch
+    ```
+    
+6. stash 存储应用
+    
+    ```jsx
+    git stash pop @stash{1}
+    ```
+    
+7. 查到 git 某个文件何时删除变更的 
+    
+    ```jsx
+    git log -- <path> 查看git 历史记录和该路径契合的变更，例如删除新增
+    获取到 commitId后
+    git show <commitId> 查看该变更都变更了哪些文件，用来确定该文件的变更内容
+    ```
+    
+
+8. 放弃本地更改切换分支
+
+    ```jsx
+    git checkout branch -f
+    ```

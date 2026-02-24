@@ -1,0 +1,314 @@
+---
+title: 'Zustand 状态管理利器'
+date: '2026-01-05'
+tags: ['技术学习与分享']
+draft: false
+summary: 状态管理利器使用心得
+---
+
+## 📑 目录
+
+1. [是什么？](#是什么)
+2. [为什么需要？](#为什么需要)
+3. [快速开始](#快速开始)
+4. [Zustand + Immer 实践](#zustand--immer-实践)
+5. [进阶使用](#进阶使用)
+6. [对比分析](#对比分析)
+7. [学习资源](#学习资源)
+8. [总结](#总结)
+
+---
+
+## 是什么？
+
+**Zustand** 是一个轻量级的 React 状态管理库，其核心理念是：
+
+> 用最少的概念，解决全局状态共享问题
+
+### 核心特点
+
+* ✅ 极简 API：一个 store 就是一个普通 Hook
+* ✅ 零 Provider：无需包裹组件树
+* ✅ 按需订阅：只在选中状态变化时触发渲染
+* ✅ TypeScript 优先：天然类型推导
+
+### 基本示例
+
+```ts
+import { create } from "zustand";
+
+const useCounterStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+}));
+
+// 组件中使用
+const count = useCounterStore((state) => state.count);
+```
+
+---
+
+## 为什么需要？
+
+在实际项目中常见痛点：
+
+| 问题         | 传统方案                 | Zustand 方案 |
+| ---------- | -------------------- | ---------- |
+| Props 层层传递 | Context / Redux      | 直接调用 Store |
+| 状态分散       | useReducer + Context | 集中 Store   |
+| Redux 配置复杂 | 大量样板代码               | 零配置        |
+| 无效渲染       | 手动 memo              | 自动按需订阅     |
+
+**特别适合：**
+
+* 中后台系统
+* 表单密集型应用
+* 多模块共享状态
+
+---
+
+## 快速开始
+
+### 1️⃣ 创建项目
+
+```bash
+pnpm create vite zustand-demo --template react-ts
+cd zustand-demo
+pnpm install
+```
+
+### 2️⃣ 安装依赖
+
+```bash
+pnpm add zustand
+```
+
+### 3️⃣ 创建 Store
+
+`src/stores/counterStore.ts`
+
+```ts
+import { create } from "zustand";
+
+interface CounterState {
+  count: number;
+  name: string;
+  increment: () => void;
+  decrement: () => void;
+  reset: () => void;
+  updateName: (name: string) => void;
+}
+
+const useCounterStore = create<CounterState>((set) => ({
+  count: 0,
+  name: "Zustand 用户",
+
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 })),
+  reset: () => set({ count: 0 }),
+  updateName: (name) => set({ name }),
+}));
+
+export default useCounterStore;
+```
+
+### 4️⃣ 组件中使用
+
+```tsx
+import useCounterStore from "./stores/counterStore";
+
+function App() {
+  const count = useCounterStore((s) => s.count);
+  const name = useCounterStore((s) => s.name);
+  const { increment, decrement, reset, updateName } = useCounterStore();
+
+  return (
+    <div>
+      <h1>🐻 Zustand Demo</h1>
+
+      <p>{count}</p>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+      <button onClick={reset}>reset</button>
+
+      <input onChange={(e) => updateName(e.target.value)} />
+      <p>{name}</p>
+    </div>
+  );
+}
+
+export default App;
+```
+
+---
+
+## Zustand + Immer 实践
+
+### ❌ 繁琐写法
+
+```ts
+set((state) => ({
+  user: {
+    ...state.user,
+    profile: {
+      ...state.user.profile,
+      address: {
+        ...state.user.profile.address,
+        city: "北京",
+      },
+    },
+  },
+}));
+```
+
+### ✅ 使用 Immer
+
+```bash
+pnpm add immer
+```
+
+```ts
+import { create } from "zustand";
+import { produce } from "immer";
+
+const useUserStore = create((set) => ({
+  user: {
+    name: "张三",
+    profile: {
+      age: 25,
+      address: { city: "上海", street: "南京路" },
+    },
+  },
+
+  updateCity: (city: string) =>
+    set(
+      produce((state: any) => {
+        state.user.profile.address.city = city;
+      })
+    ),
+}));
+```
+
+### 优势
+
+| 维度   | 原生写法 | Immer |
+| ---- | ---- | ----- |
+| 代码量  | 多    | 少     |
+| 可读性  | 差    | 好     |
+| 嵌套更新 | 复杂   | 简单    |
+
+---
+
+## 进阶使用
+
+### 1️⃣ 精准渲染优化
+
+```ts
+const name = useUserStore((s) => s.name);
+```
+
+合并订阅：
+
+```ts
+import { shallow } from "zustand/shallow";
+
+const { name, email } = useUserStore(
+  (s) => ({ name: s.name, email: s.email }),
+  shallow
+);
+```
+
+---
+
+### 2️⃣ 中间件组合
+
+```ts
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+
+const useStore = create(
+  devtools(
+    persist(
+      (set) => ({
+        theme: "light",
+        toggle: () =>
+          set((s) => ({ theme: s.theme === "light" ? "dark" : "light" })),
+      }),
+      { name: "app-storage" }
+    )
+  )
+);
+```
+
+---
+
+### 3️⃣ React 外部访问
+
+```ts
+const user = useUserStore.getState();
+useUserStore.setState({ name: "新用户" });
+```
+
+---
+
+### 4️⃣ 异步操作
+
+```ts
+const useAsyncStore = create((set) => ({
+  data: null,
+  loading: false,
+
+  fetchData: async () => {
+    set({ loading: true });
+    const res = await fetch("/api/data");
+    const data = await res.json();
+    set({ data, loading: false });
+  },
+}));
+```
+
+---
+
+## 对比分析
+
+| 维度   | Redux Toolkit    | Context | Zustand  |
+| ---- | ---------------- | ------- | -------- |
+| 代码量  | 多                | 中       | 少        |
+| 学习成本 | 高                | 中       | 低        |
+| 性能   | 需优化              | 易重渲染    | 自动优化     |
+| 异步   | createAsyncThunk | 手动      | 直接 async |
+| 持久化  | 插件               | 手动      | 内置       |
+
+### 场景推荐
+
+* 小型应用 👉 Zustand
+* 中大型 👉 Zustand / Redux
+* 表单复杂 👉 Zustand + Immer
+
+---
+
+## 学习资源
+
+### 官方
+
+* 官方文档
+* GitHub 仓库
+* Middleware 文档
+
+### 生态
+
+* React 文档
+* Immer
+* Redux DevTools
+
+---
+
+## 总结
+
+Zustand 的三个核心：
+
+1️⃣ **Create** → 创建 Store
+2️⃣ **Use** → Hook 使用状态
+3️⃣ **Set** → 更新状态
+
+> 用最简单的方式解决复杂状态管理问题
