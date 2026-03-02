@@ -1,0 +1,101 @@
+---
+title: 'openClaw 新手指南'
+date: '2026-03-02'
+tags: ['AI']
+draft: false
+summary: ''
+---
+
+## 一、环境准备
+
+### 系统要求
+
+- **Node.js** >= v22.0
+- **npm**（Node 包管理器）
+- 推荐系统：macOS / Linux
+
+### 检查当前环境
+
+```bash
+node -v    # 查看 Node 版本
+npm -v     # 查看 npm 版本
+```
+
+---
+
+## 二、安装步骤
+
+### 一键安装
+
+```bash
+curl -fsSL https://openclaw.bot/install.sh | bash
+```
+
+### 安装过程中如果卡住
+
+1. 检查 npm 镜像源：`npm config get registry`
+2. 切换国内镜像：`npm config set registry https://registry.npmmirror.com`
+3. 确认切换成功：`npm config get registry`
+
+---
+
+## 三、初始配置
+
+安装完成后会自动进入新手引导向导，也可以手动运行：
+
+| 命令 | 作用 |
+|------|------|
+| `openclaw onboard` | 重新进入新手引导 |
+| `openclaw configure` | 手动配置（API Key、模型等）|
+| `openclaw reset` | 重置所有配置 |
+
+### 配置要点
+
+- **模型选择**：支持 MiniMax、OpenAI、Claude 等
+- **注意**：使用 MiniMax 时区分国内站(minimax.com)和国际站，用常规 API Key 模式
+
+---
+
+## 四、验证安装
+
+```bash
+openclaw status    # 查看运行状态
+openclaw help     # 查看可用命令
+```
+
+---
+
+## 五、遇到问题
+
+### Q: 安装卡住不动？
+
+> A: 通常是网络问题，参考上面的镜像切换方案
+
+### Q: 配置错了想重来？
+
+> A: `openclaw reset` 然后 `openclaw onboard` 或者 `openclaw configure`
+
+### Q: 如何更新版本？
+
+> A: `openclaw upgrade` 或查看官方更新日志
+
+### Q: 当终端可以进行对话，但是 openClaw 提供的 webUI 状态 error，需要进行配置 token
+
+> **问题描述**：`unauthorized: gateway token missing (open the dashboard URL and paste the token in Control UI settings): OpenClaw Web Dashboard 需要认证令牌(Token) 才能访问。这是您 Gateway 配置里的安全设置`
+
+> **解决方案**：在 Dashboard 的 Control UI → Settings 中配置 Gateway Token
+![Gateway Token 配置界面正常页面](/static/images/openclaw-token-success.png)
+
+
+> **注意**：配置之后稍等一会才会生效
+![Gateway Token 配置界面 chat 页面](/static/images/openclaw-token.png)
+
+---
+
+## 配置过程
+
+根据终端引导配置，主要的 models、skills、hooks、可视化界面
+
+> **注意**：如果也是使用 MiniMax 要注意是国内站点还是国际站点，使用常规的 ApiKey 模式
+
+配置注意——国内站点的 MiniMax + 2.1，完成配置之后，就可以进行赋予角色，进行对话
