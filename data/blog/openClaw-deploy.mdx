@@ -3,7 +3,7 @@ title: 'openClaw 新手指南'
 date: '2026-03-02'
 tags: ['AI']
 draft: false
-summary: ''
+summary: 'openClaw 是一个开源的 AI Agent 框架，本文详细介绍其安装、配置、对接钉钉等完整流程。'
 ---
 
 ## 一、环境准备
@@ -65,37 +65,129 @@ openclaw help     # 查看可用命令
 
 ---
 
-## 五、遇到问题
+## 五、初始配置向导
+
+根据终端引导配置，主要包括：models、skills、hooks、可视化界面等模块。
+
+> **注意**：如果使用 MiniMax，要注意是国内站点还是国际站点，使用常规的 API Key 模式。国内站点推荐使用 MiniMax + 2.1 模型。
+
+完成配置后，就可以赋予角色进行对话了。
+
+---
+
+## 六、常见问题
 
 ### Q: 安装卡住不动？
 
-> A: 通常是网络问题，参考上面的镜像切换方案
+> **A**: 通常是网络问题，参考上面的镜像切换方案
 
 ### Q: 配置错了想重来？
 
-> A: `openclaw reset` 然后 `openclaw onboard` 或者 `openclaw configure`
+> **A**: 执行 `openclaw reset` 然后 `openclaw onboard` 或 `openclaw configure`
 
 ### Q: 如何更新版本？
 
-> A: `openclaw upgrade` 或查看官方更新日志
+> **A**: `openclaw upgrade` 或查看官方更新日志
 
-### Q: 当终端可以进行对话，但是 openClaw 提供的 webUI 状态 error，需要进行配置 token
+### Q: Web UI 状态显示 error？
 
-> **问题描述**：`unauthorized: gateway token missing (open the dashboard URL and paste the token in Control UI settings): OpenClaw Web Dashboard 需要认证令牌(Token) 才能访问。这是您 Gateway 配置里的安全设置`
+> **问题描述**：终端可以正常对话，但 Web UI 提示 `unauthorized: gateway token missing`。这是因为 OpenClaw Web Dashboard 需要认证令牌(Token) 才能访问。
 
-> **解决方案**：在 Dashboard 的 Control UI → Settings 中配置 Gateway Token
+> **解决方案**：在 Dashboard 的 **Control UI → Settings** 中配置 Gateway Token
+
 ![Gateway Token 配置界面正常页面](/static/images/openclaw-token-success.png)
 
-
 > **注意**：配置之后稍等一会才会生效
+
 ![Gateway Token 配置界面 chat 页面](/static/images/openclaw-token.png)
 
 ---
 
-## 配置过程
+## 七、对接钉钉
 
-根据终端引导配置，主要的 models、skills、hooks、可视化界面
+### 7.1 准备工作
 
-> **注意**：如果也是使用 MiniMax 要注意是国内站点还是国际站点，使用常规的 ApiKey 模式
+在钉钉开发者平台创建机器人，获取以下参数：
 
-配置注意——国内站点的 MiniMax + 2.1，完成配置之后，就可以进行赋予角色，进行对话
+![钉钉开发者平台](/static/images/dingding.png)
+![钉钉开发者平台](/static/images/dingdingConfig.png)
+
+| 参数 | 说明 |
+|------|------|
+| AppKey | 应用唯一标识 |
+| AppSecret | 应用密钥 |
+| AgentId | 应用 ID |
+| CorpId | 企业 ID |
+| RobotCode | 机器人 code |
+
+### 7.2 安装钉钉插件
+
+```bash
+# 安装插件
+openclaw plugins install @soimy/dingtalk
+
+# 查看插件列表，确认安装成功
+openclaw plugins list
+```
+
+### 7.3 配置钉钉 Channel
+
+编辑配置文件 `~/.openclaw/openclaw.json`，新增以下配置：
+
+```json
+{
+  "channels": {
+    "dingtalk": {
+      "enabled": true,
+      "clientId": "你的AppKey",
+      "clientSecret": "你的AppSecret",
+      "robotCode": "你的RobotCode",
+      "corpId": "你的CorpId",
+      "agentId": "你的AgentId",
+      "dmPolicy": "open",
+      "groupPolicy": "open",
+      "messageType": "markdown"
+    }
+  }
+}
+```
+
+或者运行命令进行交互式配置：
+
+```bash
+openclaw configure
+```
+
+### 7.4 配置插件参数
+
+安装插件时会要求填写以下参数：
+
+| 参数 | 推荐值 | 说明 |
+|------|--------|------|
+| Card Template Key | `content` | 卡片模板中用于承载消息内容的字段名 |
+| Media URL allowlist | (可留空) | 允许加载的媒体资源 URL 白名单，如 `example.com,cdn.example.com` |
+| Runtime reconnect cycle limit | `50` | WebSocket 连接断开时最大重连次数 |
+| Inbound media max size | `10` | 允许接收的媒体文件最大大小（MB） |
+
+### 7.5 启动并测试
+
+```bash
+# 启动 gateway
+openclaw gateway start
+
+# 或重启
+openclaw gateway restart
+
+# 查看 Channel 状态
+openclaw channels list
+```
+
+正常状态示例：`dingtalk   running`
+
+### 7.6 测试机器人
+
+在钉钉中打开应用，私聊机器人或群聊 @机器人进行测试。
+
+例如： `@机器人 帮我总结今天的工作`
+
+机器人会调用 OpenClaw Agent 进行回复。
