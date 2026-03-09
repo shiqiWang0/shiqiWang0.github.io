@@ -43,11 +43,11 @@ curl -fsSL https://openclaw.bot/install.sh | bash
 
 安装完成后会自动进入新手引导向导，也可以手动运行：
 
-| 命令 | 作用 |
-|------|------|
-| `openclaw onboard` | 重新进入新手引导 |
-| `openclaw configure` | 手动配置（API Key、模型等）|
-| `openclaw reset` | 重置所有配置 |
+| 命令                 | 作用                        |
+| -------------------- | --------------------------- |
+| `openclaw onboard`   | 重新进入新手引导            |
+| `openclaw configure` | 手动配置（API Key、模型等） |
+| `openclaw reset`     | 重置所有配置                |
 
 ### 配置要点
 
@@ -112,13 +112,13 @@ openclaw help     # 查看可用命令
 ![钉钉开发者平台](/static/images/dingding.png)
 ![钉钉开发者平台](/static/images/dingdingConfig.png)
 
-| 参数 | 说明 |
-|------|------|
-| AppKey | 应用唯一标识 |
-| AppSecret | 应用密钥 |
-| AgentId | 应用 ID |
-| CorpId | 企业 ID |
-| RobotCode | 机器人 code |
+| 参数      | 说明         |
+| --------- | ------------ |
+| AppKey    | 应用唯一标识 |
+| AppSecret | 应用密钥     |
+| AgentId   | 应用 ID      |
+| CorpId    | 企业 ID      |
+| RobotCode | 机器人 code  |
 
 ### 7.2 安装钉钉插件
 
@@ -162,12 +162,12 @@ openclaw configure
 
 安装插件时会要求填写以下参数：
 
-| 参数 | 推荐值 | 说明 |
-|------|--------|------|
-| Card Template Key | `content` | 卡片模板中用于承载消息内容的字段名 |
-| Media URL allowlist | (可留空) | 允许加载的媒体资源 URL 白名单，如 `example.com,cdn.example.com` |
-| Runtime reconnect cycle limit | `50` | WebSocket 连接断开时最大重连次数 |
-| Inbound media max size | `10` | 允许接收的媒体文件最大大小（MB） |
+| 参数                          | 推荐值    | 说明                                                            |
+| ----------------------------- | --------- | --------------------------------------------------------------- |
+| Card Template Key             | `content` | 卡片模板中用于承载消息内容的字段名                              |
+| Media URL allowlist           | (可留空)  | 允许加载的媒体资源 URL 白名单，如 `example.com,cdn.example.com` |
+| Runtime reconnect cycle limit | `50`      | WebSocket 连接断开时最大重连次数                                |
+| Inbound media max size        | `10`      | 允许接收的媒体文件最大大小（MB）                                |
 
 ### 7.5 启动并测试
 
@@ -191,3 +191,9 @@ openclaw channels list
 例如： `@机器人 帮我总结今天的工作`
 
 机器人会调用 OpenClaw Agent 进行回复。
+
+## 八、 上云服务器
+
+这里购买的是 腾讯云提供的 轻量应用服务器Linux 2核2G，openClaw 镜像，只需要配置一下内容既可快捷接入【比本地自己搭建快很多】
+
+![上云配置](/static/images/tencent.png)
