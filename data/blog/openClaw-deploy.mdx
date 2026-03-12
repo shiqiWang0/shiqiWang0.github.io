@@ -197,3 +197,13 @@ openclaw channels list
 这里购买的是 腾讯云提供的 轻量应用服务器Linux 2核2G，openClaw 镜像，只需要配置一下内容既可快捷接入【比本地自己搭建快很多】
 
 ![上云配置](/static/images/tencent.png)
+
+当需要本地开启 web 可视化进行访问； 需要进行反向代理进行
+
+```
+ssh -N -L 18789:127.0.0.1:18789 root@xx.xx.xx.xx [公网 ip]
+root@43.163.99.131's password: xxx
+```
+
+进行代理； 后续可以通过本地访问
+localhost:18789 进行访问
